@@ -8,3 +8,11 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 4. Laravel 08
 5. MySql
 6. Postman API tester
+
+
+## Features
+1. UI Routing
+2. Login / Sign up
+3. CRUD API's
+4. Search & Pagination
+5. Multi-languages
