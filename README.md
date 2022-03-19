@@ -1,5 +1,5 @@
 # reactjs-laravel-simple-dashboard
-This is a simple REact & Laravel dashboard for products, the target is to integrate Laravel and React in one simple project
+This is a simple REact & Laravel dashboard for products, the target is to integrate Laravel and React API's in a simple project.
 
 ## Tech. In Use:
 1. React.js
