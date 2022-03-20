@@ -19,3 +19,4 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 6. React Login / Sign up / Log out
 7. Backend Form Vlaidation
 8. CRUD API's
+9. Testing API's
