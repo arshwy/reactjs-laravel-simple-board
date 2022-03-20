@@ -12,7 +12,8 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 
 ## Features
 1. UI Routing
-2. Login / Sign up
-3. CRUD API's
+2. UI Form Validation
+3. Localization
 4. Search & Pagination
-5. Localization
+5. Login / Sign up
+6. CRUD API's
