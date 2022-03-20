@@ -12,9 +12,10 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 
 ## Features
 1. UI Routing
-2. UI Form Validation
-3. Localization
-4. Search & Pagination
-5. Login / Sign up
-6. Backend Form Vlaidation
-7. CRUD API's
+2. Protected Routes
+3. UI Form Validation
+4. Localization
+5. Search & Pagination
+6. Login / Sign up
+7. Backend Form Vlaidation
+8. CRUD API's
