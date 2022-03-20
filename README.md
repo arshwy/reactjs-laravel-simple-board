@@ -16,4 +16,5 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 3. Localization
 4. Search & Pagination
 5. Login / Sign up
-6. CRUD API's
+6. Backend Form Vlaidation
+7. CRUD API's
