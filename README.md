@@ -14,10 +14,13 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 1. UI Routing
 2. Protected Routes
 3. UI Frontend Form Validation
-4. Localization
-5. Search & Pagination
-6. React Login / Sign up / Log out
-7. Backend Form Vlaidation
-8. API's Integration
-9. CRUD Table
-10. Testing API's
+4. React Pagination
+5. Localization
+6. Live Results Search
+7. Search Database
+8. React Login / Sign up / Log out
+9. Backend Form Vlaidation
+10. Laravel Pagination
+11. API's Integration
+12. CRUD Table
+13. Testing API's
