@@ -16,7 +16,7 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 3. React Form Validation
 4. React Pagination
 5. React Localization
-6. React Live Results Search
+6. Live Search for Results
 7. Search Database
 8. React Login / Sign up / Log out
 9. Backend Form Vlaidation
