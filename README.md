@@ -23,4 +23,5 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 10. Laravel Pagination
 11. CRUD Table
 12. REST API Integration
+13. API Authentication by Sanctum
 14. Testing API's
