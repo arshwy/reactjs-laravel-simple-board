@@ -16,12 +16,13 @@ This is a simple REact & Laravel dashboard for products, the target is to integr
 3. React Form Validation
 4. React Pagination
 5. React Localization
-6. Live Search for Results
-7. Search Database
-8. React Login / Sign up / Log out
-9. Backend Form Vlaidation
-10. Laravel Pagination
-11. CRUD Table
-12. REST API Integration
-13. API Authentication by Sanctum
-14. Testing API's
+6. React-redux
+7. Live Search for Results
+8. Search Database
+9. React Login / Sign up / Log out
+10. Backend Form Vlaidation
+11. Laravel Pagination
+12. CRUD Table
+13. REST API Integration
+14. API Authentication by Sanctum
+15. Testing API's
