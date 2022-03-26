@@ -1,8 +1,8 @@
 import { Button } from 'react-bootstrap';
 import React, { useState, useEffect} from 'react';
-import { useNavigate } from 'react-router-dom';
 import Header from './Header.js';
 import HomeProducts from './HomeProducts.js'
+import axios from 'axios';
 
 const Home = () => {
   const [keyword, setKeyword] = useState('');
@@ -10,18 +10,11 @@ const Home = () => {
   const [products, setProducts] = useState(null);
   const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [productsPerPage, setProductsPerPage] = useState(5);
+  const [productsPerPage] = useState(5);
   const [pages, setPages] = useState('');
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const [currentProducts, setCurrentProducts] = useState('');
-
-  // runs on the mount of the component
-  // and on any update on the component
-  useEffect(() => {});
-
-  // runs once on the mount of the component
-  useEffect(() => {}, [/*no dependancies*/]);
 
   // runs at the mount of the component
   // and on any change of the products
@@ -47,7 +40,7 @@ const Home = () => {
       if (keyword) {
         setProducts(allProducts.filter((p) => {
           return p.name.includes(keyword) || p.description.includes(keyword) ||
-                 p.id == keyword || p.price == keyword
+                 p.id.toString() === keyword || p.price === keyword
         }));
       }
       else {
@@ -62,14 +55,20 @@ const Home = () => {
     }
   }, [currentPage]);
 
-  const search = async (e) => {
+  const search = (e) => {
     e.preventDefault();
+
     setLoading(true);
-    var response = await fetch("http://localhost:8000/api/search_products/"+keyword, {});
-    response = await response.json();
+    axios.get(`/api/search_products/${keyword}`)
+    .then( response => {
+      response = response.data;
+      setProducts(response.products);
+      setAllProducts(response.products);
+    })
+    .catch( error => {
+      console.log(error);
+    });
     setLoading(false);
-    setProducts(response);
-    setAllProducts(response);
   }
 
   const clear = () => {
@@ -107,6 +106,7 @@ const Home = () => {
           </div>
         </div>
         </div>
+
         {products ?
           <HomeProducts
               productsLenght={products.length}
@@ -116,8 +116,16 @@ const Home = () => {
               pages={pages}
               next={next}
               previous={previous}
-            />
-          : <h5 className="text-center">Please search the database to get your results!</h5>
+            />: loading ?
+                <div  className="text-center">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                  <a6>&nbsp;&nbsp; Loading...</a6>
+                </div> :
+                <h5 className="text-center">
+                  Please search the database to get your results!
+                </h5>
         }
       </div>
     </>

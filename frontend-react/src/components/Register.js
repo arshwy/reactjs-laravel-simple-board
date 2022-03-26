@@ -2,6 +2,7 @@ import { Button } from 'react-bootstrap'
 import React, { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from './Header.js';
+import axios from 'axios';
 
 const Register = () => {
   const navigate = useNavigate()
@@ -52,29 +53,26 @@ const Register = () => {
     }
   }
 
-  async function registerApi(user){
-    var response = await fetch("http://localhost:8000/api/register", {
-      method:'POST',
-      body:JSON.stringify(user),
-      headers:{
-        "Content-Type":"application/json",
-        "Accept":"application/json"
+  function registerApi(user){
+    axios.post(`/api/register`, user)
+    .then(response => {
+      response = response.data;
+      switch (response.status) {
+        case 422:
+          setFormErrors(response.errors);
+          break;
+        case 201: case 200:
+          localStorage.setItem("user-info", JSON.stringify({...response.user, 'token':response.token}));
+          navigate("/add"); // redirect to add product page
+          break;
+        default:
+          console.log('error in axios switch!');
+          break;
       }
+    })
+    .catch(error => {
+      console.log(error);
     });
-    // console.log(response); // Promise
-    switch (response.status) {
-      case 422:
-        response = await response.json(); // Object contains the errors
-        setFormErrors(response.errors);
-        break;
-      case 200:
-        response = await response.json();
-        localStorage.setItem("user-info", JSON.stringify(response));
-        navigate("/add"); // redirect to add product page
-        break;
-      default:
-        break;
-    }
   }
 
   return (

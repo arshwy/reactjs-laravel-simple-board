@@ -1,30 +1,29 @@
-import { Button } from 'react-bootstrap';
 import React, { useState, useEffect} from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import Header from './Header.js';
 import WarningModal from './WarningModal.js';
 import EditModal from './EditModal.js';
 import Toast from './Toast.js';
 import AddForm from './AddForm.js';
+import axios from 'axios';
 
 const AddProduct = () => {
-  const navigate = useNavigate("");
   const [formData, setFormData] = useState({name:"", description:"", price:"" });
   const [dataToEdit, setDataToEdit] = useState({name:"", description:"", price:"" });
   const [imageToEdit, setImageToEdit] = useState('');
   const [image, setImage] = useState('');
   const [formErrors, setFormErrors] = useState({});
   const [allProducts, setAllProducts] = useState([]);
-  const [actionProduct, setActionProduct] = useState();
   const [productToDelete, setProductToDelete] = useState('');
   const [productToEdit, setProductToEdit] = useState('');
   const [infoMessage, setInfoMessage] = useState(null);
+  const [firstMount, setFirstMount] = useState(true);
 
   // for pagination
   const [productsPerPage, setProductsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastPage, setLastPage] = useState(null);
-  const [paginationLinks, setPaginationLinks] = useState([]); // array
+  // const [paginationLinks, setPaginationLinks] = useState([]); // array
   const [nextPage, setNextPage] = useState(null);
   const [previousPage, setPreviousPage] = useState(null);
   const [totalProducts, setTotalProducts] = useState(null);
@@ -45,33 +44,48 @@ const AddProduct = () => {
     });
   }
 
-  const getAll = async () => {
-    var response = await fetch("http://localhost:8000/api/get_all_products/", {
-      method:'POST',
+  const paginateAll = () => {
+    console.log('request');
+    axios.get(`/api/paginate_all_products/${productsPerPage}?page=${currentPage}`)
+    .then(response => {
+      var data = response.data;
+      switch (data.status) {
+        case 422:
+          console.log("error status 422 in switch", response);
+          break;
+        case 201:
+          setAllProducts(data.products.data);
+          setLastPage(data.products.last_page);
+          // setPaginationLinks(data.products.links);
+          setNextPage(data.products.next_page_url);
+          setPreviousPage(data.products.prev_page_url);
+          setTotalProducts(data.products.total);
+          setFirstSerialOfCurrentPage(data.products.from);
+          setLastSerialOfCurrentPage(data.products.to);
+          break;
+        default:
+          console.log("default status in axios switch: ", response);
+          break;
+      }
+    })
+    .catch(error => {
+      console.log(error);
     });
-    response = await response.json();
-    // console.log(response.products);
-    setAllProducts(response.products);
   }
 
-  const paginateAll = async () => {
-    var response = await fetch(`http://localhost:8000/api/paginate_all_products/${productsPerPage}?page=${currentPage}`);
-    response = await response.json();
-    // these are the data comes from the laravel paginate function return
-    setAllProducts(response.products.data);
-    // setCurrentPage(response.products.currentPage);
-    setLastPage(response.products.last_page);
-    setPaginationLinks(response.products.links);
-    setNextPage(response.products.next_page_url);
-    setPreviousPage(response.products.prev_page_url);
-    setTotalProducts(response.products.total);
-    setFirstSerialOfCurrentPage(response.products.from);
-    setLastSerialOfCurrentPage(response.products.to);
-  }
-
-  // getAll();
   useEffect(() => {
-    // getAll();
+    // if it is the first mount dont work
+    !firstMount && paginateAll();
+  }, [currentPage]);
+
+  useEffect(() => {
+    // if it is the first mount dont work
+    !firstMount && paginateAll();
+    setCurrentPage(1);
+  }, [productsPerPage]);
+
+  useEffect(() => {
+    // if it is the first mount dont work
     paginateAll();
     setTimeout(() => {
       setInfoMessage(null);
@@ -79,13 +93,11 @@ const AddProduct = () => {
   }, [ infoMessage ]);
 
   useEffect(() => {
+    // this renders the pagonation request at the first time
+    // and tells the other useEffet to work
+    setFirstMount(false);
     paginateAll();
-  }, [currentPage]);
-
-  useEffect(() => {
-    paginateAll();
-    setCurrentPage(1);
-  }, [productsPerPage]);
+  }, []);
 
   const next = (e) => {
     e.preventDefault();
@@ -104,78 +116,75 @@ const AddProduct = () => {
     product.append('description', formData.description.toString().trim());
     product.append('price', formData.price.toString().trim());
     product.append('image', image);
-    var response = await fetch("http://localhost:8000/api/add_product", {
-      method:'POST',
-      body: product,
-    });
-    switch (response.status) {
-      case 422:
-        response = await response.json(); // Object contains the errors
-        setFormErrors(response.errors);
-        setTimeout(() => {
-          setFormErrors({});
-        }, 4000);
-        break;
-      case 200: case 201:
-        response = await response.json();
-        setInfoMessage('One product has been added successfully!');
-        setFormData({name:"", description:"", price:"" });
-        setImage('');
-        break;
-      default:
-        break;
-    }
-  }
-
-  const getProduct = async () => {
-    var response = await fetch("http://localhost:8000/api/add_product_by_id", {
-      method:'POST',
-      body: JSON.stringify({product_id: allProducts[productToEdit].id}),
-      headers:{
-        "Content-Type":"application/json",
-        "Accept":"application/json"
+    axios.post(`/api/add_product`, product)
+    .then(response => {
+      response = response.data;
+      switch (response.status) {
+        case 422:
+          setFormErrors(response.errors);
+          setTimeout(() => {
+            setFormErrors({});
+          }, 4000);
+          break;
+        case 200: case 201:
+        console.log(response.product);
+          setInfoMessage('One product has been added successfully!');
+          setFormData({name:"", description:"", price:"" });
+          setImage('');
+          break;
+        default:
+          console.log('Error in switch status');
+          break;
       }
+    })
+    .catch( error => {
+      console.log(error);
     });
-    return response = await response.json();
   }
 
   const edit = (id) => {
     setProductToEdit(id);
-    var product = allProducts.find(p => p.id == id);
+    var product = allProducts.find(p => p.id === id);
     setDataToEdit(product);
     setImageToEdit(product.file_path);
   }
 
-  const update = async () => {
-    var p = allProducts.find(p => productToEdit == p.id);
+  const cancelEdit = (e) => {
+    e.preventDefault();
+    setProductToEdit(null);
+  }
+
+  const update = async (e) => {
+    e.preventDefault()
+    var p = allProducts.find(p => productToEdit === p.id);
     const product = new FormData();
     product.append('product_id', p.id);
     product.append('name', dataToEdit.name.toString().trim());
     product.append('description', dataToEdit.description.toString().trim());
     product.append('price', dataToEdit.price.toString().trim());
     product.append('image', imageToEdit);
-    var response = await fetch("http://localhost:8000/api/update_product", {
-      method:'POST',
-      body: product,
+    axios.post(`/api/update_product`, product)
+    .then( response => {
+      var data = response.data;
+      switch (data.status) {
+        case 422:
+          setFormErrors(data.errors);
+          setTimeout(() => {
+            setFormErrors({});
+          }, 4000);
+          break;
+        case 201:
+          setProductToEdit(null);
+          setInfoMessage('One product has been updated successfully!');
+          break;
+        default:
+          console.log(data);
+          break;
+      }
+    })
+    .catch( error => {
+
     });
-    switch (response.status) {
-      case 422:
-        response = await response.json(); // Object contains the errors
-        setFormErrors(response.errors);
-        setTimeout(() => {
-          setFormErrors({});
-        }, 4000);
-        break;
-      case 200: case 201:
-        response = await response.json();
-        setProductToEdit(null);
-        setInfoMessage('One product has been updated successfully!');
-        break;
-      default:
-        response = await response.json();
-        console.log(response);
-        break;
-    }
   }
 
   const warning = (id) => {
@@ -188,16 +197,9 @@ const AddProduct = () => {
   }
 
   const deleteApi = async () => {
-    var p = allProducts.find(p => productToDelete == p.id);
-    var response = await fetch("http://localhost:8000/api/delete_product", {
-      method:'POST',
-      body: JSON.stringify({product_id: p.id}),
-      headers:{
-        "Content-Type":"application/json",
-        "Accept":"application/json"
-      }
-    });
-    response = await response.json();
+    var p = allProducts.find(p => productToDelete === p.id);
+    var data = {product_id: p.id};
+    axios.post(`api/delete_product`, data);
     setProductToDelete(null);
     setInfoMessage('One product has been deleted successfully!');
   }
@@ -252,24 +254,23 @@ const AddProduct = () => {
                   <tr key={p.id}>
                     <th scope="row">{firstSerialOfCurrentPage+i}</th>
                     <td>PID-{p.id}</td>
-                    <td><img src={"http://127.0.0.1:8000/"+p.file_path} width="120px;"/></td>
+                    <td><img src={"http://127.0.0.1:8000/"+p.file_path} width="120px;" alt=""/></td>
                     <td>{p.name}</td>
                     <td>{p.description}</td>
                     <td>{p.price} $</td>
                     <td>
-                      <a onClick={()=>edit(p.id)} className="btn btn-warning btn-sm m-1">Edit</a>
-                      <a onClick={()=>warning(p.id)} className="btn btn-danger btn-sm m-1">Delete</a>
+                      <button onClick={()=>edit(p.id)} className="btn btn-warning btn-sm m-1">Edit</button>
+                      <button onClick={()=>warning(p.id)} className="btn btn-danger btn-sm m-1">Delete</button>
                     </td>
-                  </tr>
-                )
+                  </tr>)
               }</tbody>
             </table>
             <div>
               { previousPage &&
-                <a href="" onClick={previous} className="mr-3">Previous</a>
+                <a href="/#" onClick={previous} className="mr-3">Previous</a>
               }
               { nextPage &&
-                <a href="" onClick={next} className="mr-3">Next</a>
+                <a href="/#" onClick={next} className="mr-3">Next</a>
               }
             </div>
           </div>
@@ -289,7 +290,7 @@ const AddProduct = () => {
           dataToEdit={dataToEdit}
           formErrors={formErrors}
           onUpdate={update}
-          onCancel={()=>setProductToEdit(null)}
+          onCancel={cancelEdit}
         />}
 
           {infoMessage && <Toast

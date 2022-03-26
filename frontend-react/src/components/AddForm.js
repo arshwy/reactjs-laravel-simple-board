@@ -1,7 +1,15 @@
 import { Button } from 'react-bootstrap';
+import React, { useState}  from 'react';
 
 
 const AddForm = ({ setImage, formData, infoMessage, formErrors, handleChange, add }) => {
+
+  const [showForm, setShowForm] = useState(false);
+
+  const closeForm = (e) => {
+    e.preventDefault();
+    setShowForm(false);
+  }
 
   return(
     <div className="row justify-content-center">
@@ -9,31 +17,41 @@ const AddForm = ({ setImage, formData, infoMessage, formErrors, handleChange, ad
         <h2 className="text-center">Add Product</h2>
         <div className="add-form my-5">
           <form className="py-3" encType="multipart/form-data">
-            { infoMessage && <p className="alert alert-success py-2">{infoMessage}</p> }
-            <div className="form-group">
-              <label>Product Image</label>
-              <input onChange={setImage}
-                     type="file" name="image" className="form-control p-1"/>
-              {formErrors.image && <div className="text text-danger text-left">{formErrors.image}</div>}
-            </div>
-            <div className="form-group">
-              <input onChange={handleChange} value={formData.name}
-                     type="text" name="name" className="form-control" placeholder="Title"/>
-              {formErrors.name && <div className="text text-danger text-left">{formErrors.name}</div>}
-            </div>
-            <div className="form-group">
-              <textarea onChange={handleChange} value={formData.description}
-                        type="text" name="description" rows="4" className="form-control" placeholder="Description"></textarea>
-              {formErrors.description && <div className="text text-danger text-left">{formErrors.description}</div>}
-            </div>
-            <div className="form-group">
-            <label>Price</label>
-              <input onChange={handleChange} value={formData.price}
-                     type="number" name="price" className="form-control" placeholder="$"/>
-              {formErrors.price && <div className="text text-danger text-left">{formErrors.price}</div>}
-            </div>
-            <Button onClick={add} type="submit"
-                    variant="success" size="lg">Add</Button>
+            {showForm &&
+              <div>
+                <div className="text-right"><a href="/#" style={{color:"red"}} onClick={closeForm}>Close</a></div>
+                { infoMessage && <p className="alert alert-success py-2">{infoMessage}</p> }
+                <div className="form-group">
+                  <label>Product Image</label>
+                  <input onChange={setImage}
+                         type="file" name="image" className="form-control p-1"/>
+                  {formErrors.image && <div className="text text-danger text-left">{formErrors.image}</div>}
+                </div>
+                <div className="form-group">
+                  <input onChange={handleChange} value={formData.name}
+                         type="text" name="name" className="form-control" placeholder="Title"/>
+                  {formErrors.name && <div className="text text-danger text-left">{formErrors.name}</div>}
+                </div>
+                <div className="form-group">
+                  <textarea onChange={handleChange} value={formData.description}
+                            type="text" name="description" rows="4" className="form-control" placeholder="Description"></textarea>
+                  {formErrors.description && <div className="text text-danger text-left">{formErrors.description}</div>}
+                </div>
+                <div className="form-group">
+                <label>Price</label>
+                  <input onChange={handleChange} value={formData.price}
+                         type="number" name="price" className="form-control" placeholder="$"/>
+                  {formErrors.price && <div className="text text-danger text-left">{formErrors.price}</div>}
+                </div>
+              </div>
+            }
+            { showForm &&
+              <Button onClick={add} type="submit" variant="success" size="lg">Add</Button>
+            }
+            { showForm ? '':
+              <Button onClick={()=>setShowForm(true)} type="button" variant="success" size="lg">Add</Button>
+            }
+
           </form>
         </div>
       </div>

@@ -20,9 +20,10 @@ class Product extends Controller
         'price' => 'required',
       ]);
       if ($validator->fails()) {
-        return response()->json(
-          ['errors'=>$validator->errors()],  422
-        );
+        return response()->json([
+          'errors' => $validator->errors(),
+          'status' => 422
+        ]);
       }
       $product = new ProductModel;
       $extension = $request->image->extension();
@@ -32,7 +33,10 @@ class Product extends Controller
       $product->description = $request->description;
       $product->price = $request->price;
       $product->save();
-      return $product;
+      return [
+        'product' => $product,
+        'status'  => 201
+      ];
     }
 
 
@@ -50,7 +54,7 @@ class Product extends Controller
       return response()->json([
         'products' => $products,
         'message'  => 'success',
-        'status'   => true,
+        'status'   => 201,
       ]);
     }
 
@@ -79,7 +83,6 @@ class Product extends Controller
       $product->delete();
       return $product1;
     }
-
     public function update(Request $request){
       $validator = Validator::make($request->all(), [
         'name'  => 'required|max:100',
@@ -88,9 +91,10 @@ class Product extends Controller
         'price' => 'required',
       ]);
       if ($validator->fails()) {
-        return response()->json(
-          ['errors' => $validator->errors()],  422
-        );
+        return response()->json([
+          'errors' => $validator->errors(),
+          'status' => 422
+        ]);
       }
       $product = ProductModel::find($request->product_id);
       if ($request->hasFile('image')) {
@@ -102,7 +106,10 @@ class Product extends Controller
       $product->description = $request->description;
       $product->price = $request->price;
       $product->save();
-      return $product;
+      return [
+        'product' => $product,
+        'status' => 201
+      ];
     }
 
 
@@ -110,11 +117,14 @@ class Product extends Controller
     public function search(Request $request){
       // return "search";
       $keyword = $request->keyword;
-      return  ProductModel::where('name', 'like', "%$keyword%")
+      $products = ProductModel::where('name', 'like', "%$keyword%")
                   ->orWhere('description', 'like', "%$keyword%")
                   ->orWhere('price', 'like', "%$keyword%")
                   ->orWhere('id', 'like', "%$keyword%")
                   ->get();
+      return [
+        'products' => $products
+      ];
     }
 
 

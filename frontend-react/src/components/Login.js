@@ -1,7 +1,8 @@
 import Header from './Header.js';
 import { Button } from 'react-bootstrap'
-import { useState, useEffect} from 'react';
+import React, { useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate()
@@ -29,28 +30,28 @@ const Login = () => {
     loginApi(user);
   }
 
-  const loginApi = async (user) =>  {
-    var response = await fetch("http://localhost:8000/api/login", {
-      method:'POST',
-      body:JSON.stringify(user),
-      headers:{
-        "Content-Type":"application/json",
-        "Accept":"application/json"
-      }
+  const loginApi = (user) =>  {
+    axios.get("/sanctum/csrf-cookie").then(response => {
+      axios.post(`/api/login`, user)
+      .then(res => {
+        response = res.data;
+        switch (response.status) {
+          case 422:
+            setFormErrors(response.errors);
+            break;
+          case 201:
+            localStorage.setItem("user-info", JSON.stringify({...response.user, 'token':response.token}));
+            navigate("/add"); // redirect to add product page
+            break;
+          default:
+            console.log("default status in axios switch: ", response);
+            break;
+        }
+      })
+      .catch(error => {
+        console.log("axios: ", error);
+      });
     });
-    switch (response.status) {
-      case 422:
-        response = await response.json(); // Object contains the errors
-        setFormErrors(response.errors);
-        break;
-      case 200:
-        response = await response.json();
-        localStorage.setItem("user-info", JSON.stringify(response));
-        navigate("/add"); // redirect to add product page
-        break;
-      default:
-        break;
-    }
   }
 
   return (

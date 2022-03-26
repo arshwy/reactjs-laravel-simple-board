@@ -1,4 +1,4 @@
-
+import React from 'react';
 
 
 
@@ -31,7 +31,7 @@ const HomeResults = ({productsLenght, currentProducts, productsPerPage, currentP
               <tr key={p.id}>
                 <th scope="row">{i+1}</th>
                 <td>PID-{p.id}</td>
-                <td><img src={`http://127.0.0.1:8000/${p.file_path}`} width="120px;"/></td>
+                <td><img src={`http://127.0.0.1:8000/${p.file_path}`} width="120px;" alt=""/></td>
                 <td>{p.name}</td>
                 <td>{p.description}</td>
                 <td>{p.price} $</td>
@@ -40,10 +40,10 @@ const HomeResults = ({productsLenght, currentProducts, productsPerPage, currentP
         </table>
         <div>
           { currentPage > 1 &&
-            <a href="" onClick={previous} className="mr-3">Previous</a>
+            <a href="/#" onClick={previous} className="mr-3">Previous</a>
           }
           { (currentPage < pages) &&
-            <a href="" onClick={next} className="mr-3">Next</a>
+            <a href="/#" onClick={next} className="mr-3">Next</a>
           }
         </div>
       </div>

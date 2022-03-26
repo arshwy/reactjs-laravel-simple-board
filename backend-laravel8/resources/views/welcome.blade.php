@@ -23,18 +23,16 @@
     </head>
     <body class="antialiased">
         <div class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center py-4 sm:pt-0">
-            @if (Route::has('login'))
-                <div class="hidden fixed top-0 right-0 px-6 py-4 sm:block">
-                    @auth
-                        <a href="http://localhost:3000/home" class="text-sm text-gray-700 dark:text-gray-500 underline">Home</a>
-                        <a href="http://localhost:3000/add" class="text-sm text-gray-700 dark:text-gray-500 underline">Add Product</a>
-                        <a href="http://localhost:3000/update" class="text-sm text-gray-700 dark:text-gray-500 underline">Update Product</a>
-                    @else
-                        <a href="http://localhost:3000/login" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
-                        <a href="http://localhost:3000/register" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
-                    @endauth
-                </div>
-            @endif
+            <div class="hidden fixed top-0 right-0 px-6 py-4 sm:block">
+                @auth
+                    <a href="http://localhost:3000/home" class="text-sm text-gray-700 dark:text-gray-500 underline">Home</a>
+                    <a href="http://localhost:3000/add" class="text-sm text-gray-700 dark:text-gray-500 underline">Add Product</a>
+                    <a href="http://localhost:3000/update" class="text-sm text-gray-700 dark:text-gray-500 underline">Update Product</a>
+                @else
+                    <a href="http://localhost:3000/login" class="text-sm text-gray-700 dark:text-gray-500 underline">Log in</a>
+                    <a href="http://localhost:3000/register" class="ml-4 text-sm text-gray-700 dark:text-gray-500 underline">Register</a>
+                @endauth
+            </div>
 
             <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
                 <h1>This is the backend Home Page</h1>

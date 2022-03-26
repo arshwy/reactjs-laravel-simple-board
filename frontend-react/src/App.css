@@ -10,6 +10,7 @@
 .register-form button[type='submit'],
 .login-form button[type='submit'],
 .add-form button[type='submit'],
+.add-form button[type='button'],
 .update-form button[type='submit'] {
   width: 100%;
   margin-top: 20px;

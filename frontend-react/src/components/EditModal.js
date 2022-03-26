@@ -1,4 +1,4 @@
-
+import React from 'react';
 
 
 const EditModal = ({onImageChange, imageToEdit, handleEditChange, dataToEdit, formErrors, onUpdate, onCancel}) => {
@@ -10,7 +10,7 @@ const EditModal = ({onImageChange, imageToEdit, handleEditChange, dataToEdit, fo
           padding:"20px",
         }}>
           <div>
-            <div className="text-center"><img src={"http://127.0.0.1:8000/"+imageToEdit} width="300px" className="p-2"/></div>
+            <div className="text-center"><img src={"http://127.0.0.1:8000/"+imageToEdit} width="300px" className="p-2" alt=""/></div>
             <div className="form-group">
               <label>Product Image</label>
               <input onChange={onImageChange}
@@ -36,8 +36,8 @@ const EditModal = ({onImageChange, imageToEdit, handleEditChange, dataToEdit, fo
           </div>
         </div>
         <div className="card-footer border-0 bg-white text-center">
-          <a onClick={onUpdate} className="btn btn-warning m-1">Update</a>
-          <a onClick={onCancel} className="btn btn-secondary m-1">Cancel</a>
+          <a href="/#" onClick={onUpdate} className="btn btn-warning m-1">Update</a>
+          <a href="/#" onClick={onCancel} className="btn btn-secondary m-1">Cancel</a>
         </div>
       </div>
   );
