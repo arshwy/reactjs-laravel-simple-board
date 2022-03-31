@@ -1,5 +1,13 @@
 import React, { useState, useEffect} from 'react';
-// import { useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+    createProduct,
+    deleteProduct,
+    getProducts,
+    paginateProducts,
+    updateProduct
+  } from '../redux/actions'
+
 import Header from './Header.js';
 import WarningModal from './WarningModal.js';
 import EditModal from './EditModal.js';
@@ -8,27 +16,37 @@ import AddForm from './AddForm.js';
 import axios from 'axios';
 
 const AddProduct = () => {
+  // const loading = useSelector(state => state.paginateProducts.loading)
+  const paginateState = useSelector(state => state.paginateProducts);
+  const loading = useSelector(state => state.paginateProducts.loading);
+  const products = useSelector(state => state.paginateProducts.products);
+  const allProducts = useSelector(state => state.paginateProducts.products);
+  const currentPage = useSelector(state => state.paginateProducts.current_page);
+  const lastPage = useSelector(state => state.paginateProducts.last_page);
+  const nextPage = useSelector(state => state.paginateProducts.next_page_url);
+  const previousPage = useSelector(state => state.paginateProducts.prev_page_url);
+  const totalProducts = useSelector(state => state.paginateProducts.total);
+  const firstSerialOfCurrentPage = useSelector(state => state.paginateProducts.from);
+  const lastSerialOfCurrentPage = useSelector(state => state.paginateProducts.to);
+  const [productsPerPage, setProductsPerPage] = useState(5);
+  const addState = useSelector(state => state.createProduct);
+  const updateState = useSelector(state => state.updateProduct);
+  const deleteState = useSelector(state => state.deleteProduct);
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({name:"", description:"", price:"" });
   const [dataToEdit, setDataToEdit] = useState({name:"", description:"", price:"" });
   const [imageToEdit, setImageToEdit] = useState('');
   const [image, setImage] = useState('');
   const [formErrors, setFormErrors] = useState({});
-  const [allProducts, setAllProducts] = useState([]);
   const [productToDelete, setProductToDelete] = useState('');
   const [productToEdit, setProductToEdit] = useState('');
   const [infoMessage, setInfoMessage] = useState(null);
   const [firstMount, setFirstMount] = useState(true);
 
-  // for pagination
-  const [productsPerPage, setProductsPerPage] = useState(5);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [lastPage, setLastPage] = useState(null);
-  // const [paginationLinks, setPaginationLinks] = useState([]); // array
-  const [nextPage, setNextPage] = useState(null);
-  const [previousPage, setPreviousPage] = useState(null);
-  const [totalProducts, setTotalProducts] = useState(null);
-  const [firstSerialOfCurrentPage, setFirstSerialOfCurrentPage] = useState(null); // serial of first product in the current page
-  const [lastSerialOfCurrentPage, setLastSerialOfCurrentPage] = useState(null); // serial of the last product in the current page
+
+
+
 
   const handleChange = (e) => {
     setFormData({
@@ -44,49 +62,15 @@ const AddProduct = () => {
     });
   }
 
-  const paginateAll = () => {
-    console.log('request');
-    axios.get(`/api/paginate_all_products/${productsPerPage}?page=${currentPage}`)
-    .then(response => {
-      var data = response.data;
-      switch (data.status) {
-        case 422:
-          console.log("error status 422 in switch", response);
-          break;
-        case 201:
-          setAllProducts(data.products.data);
-          setLastPage(data.products.last_page);
-          // setPaginationLinks(data.products.links);
-          setNextPage(data.products.next_page_url);
-          setPreviousPage(data.products.prev_page_url);
-          setTotalProducts(data.products.total);
-          setFirstSerialOfCurrentPage(data.products.from);
-          setLastSerialOfCurrentPage(data.products.to);
-          break;
-        default:
-          console.log("default status in axios switch: ", response);
-          break;
-      }
-    })
-    .catch(error => {
-      console.log(error);
-    });
-  }
 
   useEffect(() => {
     // if it is the first mount dont work
-    !firstMount && paginateAll();
-  }, [currentPage]);
-
-  useEffect(() => {
-    // if it is the first mount dont work
-    !firstMount && paginateAll();
-    setCurrentPage(1);
+    !firstMount && dispatch(paginateProducts({productsPerPage, currentPage}));
   }, [productsPerPage]);
 
   useEffect(() => {
     // if it is the first mount dont work
-    paginateAll();
+    dispatch(paginateProducts({productsPerPage, currentPage}));
     setTimeout(() => {
       setInfoMessage(null);
     }, 5000);
@@ -96,17 +80,19 @@ const AddProduct = () => {
     // this renders the pagonation request at the first time
     // and tells the other useEffet to work
     setFirstMount(false);
-    paginateAll();
+    dispatch(paginateProducts({productsPerPage, currentPage}));
   }, []);
 
   const next = (e) => {
     e.preventDefault();
-    setCurrentPage(currentPage+1);
+    var nextPageNum = currentPage + 1;
+    dispatch(paginateProducts({productsPerPage, currentPage: nextPageNum}));
   }
 
   const previous = (e) => {
     e.preventDefault();
-    setCurrentPage(currentPage-1);
+    var previousPageNum = currentPage - 1;
+    dispatch(paginateProducts({productsPerPage, currentPage: previousPageNum}));
   }
 
   const add = async (e) => {
@@ -116,31 +102,26 @@ const AddProduct = () => {
     product.append('description', formData.description.toString().trim());
     product.append('price', formData.price.toString().trim());
     product.append('image', image);
-    axios.post(`/api/add_product`, product)
-    .then(response => {
-      response = response.data;
-      switch (response.status) {
-        case 422:
-          setFormErrors(response.errors);
-          setTimeout(() => {
-            setFormErrors({});
-          }, 4000);
-          break;
-        case 200: case 201:
-        console.log(response.product);
-          setInfoMessage('One product has been added successfully!');
-          setFormData({name:"", description:"", price:"" });
-          setImage('');
-          break;
-        default:
-          console.log('Error in switch status');
-          break;
-      }
-    })
-    .catch( error => {
-      console.log(error);
-    });
+    dispatch(createProduct({product}));
   }
+  useEffect(()=>{
+    if (addState.success) {
+      setInfoMessage('One product has been created successfully!');
+    }
+    else {
+      if (!addState.loading && addState.validationError) {
+        setFormErrors(addState.error);
+        setTimeout(() => {
+          setFormErrors({});
+        }, 5000);
+      }
+      else if (!addState.loading && !addState.validationError) {
+        // setFormData({name:"", description:"", price:"" });
+        // setImage('');
+      }
+    }
+  }, [addState.loading, addState.success]);
+
 
   const edit = (id) => {
     setProductToEdit(id);
@@ -249,21 +230,29 @@ const AddProduct = () => {
                   <th scope="col"></th>
                 </tr>
               </thead>
-              <tbody>{
-                allProducts.map((p, i) =>
-                  <tr key={p.id}>
-                    <th scope="row">{firstSerialOfCurrentPage+i}</th>
-                    <td>PID-{p.id}</td>
-                    <td><img src={"http://127.0.0.1:8000/"+p.file_path} width="120px;" alt=""/></td>
-                    <td>{p.name}</td>
-                    <td>{p.description}</td>
-                    <td>{p.price} $</td>
-                    <td>
-                      <button onClick={()=>edit(p.id)} className="btn btn-warning btn-sm m-1">Edit</button>
-                      <button onClick={()=>warning(p.id)} className="btn btn-danger btn-sm m-1">Delete</button>
+              <tbody>{ loading ?
+                  <tr>
+                    <td colSpan="7" className="text-center">
+                      <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                      </div>
                     </td>
-                  </tr>)
-              }</tbody>
+                  </tr> :
+                  products.map((p, i) =>
+                    <tr key={p.id}>
+                      <th scope="row">{firstSerialOfCurrentPage+i}</th>
+                      <td>PID-{p.id}</td>
+                      <td><img src={"http://127.0.0.1:8000/"+p.file_path} width="120px;" alt=""/></td>
+                      <td>{p.name}</td>
+                      <td>{p.description}</td>
+                      <td>{p.price} $</td>
+                      <td>
+                        <button onClick={()=>edit(p.id)} className="btn btn-warning btn-sm m-1">Edit</button>
+                        <button onClick={()=>warning(p.id)} className="btn btn-danger btn-sm m-1">Delete</button>
+                      </td>
+                    </tr>)
+                }
+            </tbody>
             </table>
             <div>
               { previousPage &&
