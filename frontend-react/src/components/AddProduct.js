@@ -46,8 +46,6 @@ const AddProduct = () => {
 
 
 
-
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -97,12 +95,13 @@ const AddProduct = () => {
 
   const add = async (e) => {
     e.preventDefault();
-    const product = new FormData();
-    product.append('name', formData.name.toString().trim());
-    product.append('description', formData.description.toString().trim());
-    product.append('price', formData.price.toString().trim());
-    product.append('image', image);
-    dispatch(createProduct({product}));
+    const product = {
+      'name': formData.name.toString().trim(),
+      'description': formData.description.toString().trim(),
+      'price': formData.price.toString().trim(),
+      'image': image
+    }
+    dispatch(createProduct(product));
   }
   useEffect(()=>{
     if (addState.success) {
@@ -116,8 +115,8 @@ const AddProduct = () => {
         }, 5000);
       }
       else if (!addState.loading && !addState.validationError) {
-        // setFormData({name:"", description:"", price:"" });
-        // setImage('');
+        setFormData({name:"", description:"", price:"" });
+        setImage('');
       }
     }
   }, [addState.loading, addState.success]);
@@ -144,29 +143,22 @@ const AddProduct = () => {
     product.append('description', dataToEdit.description.toString().trim());
     product.append('price', dataToEdit.price.toString().trim());
     product.append('image', imageToEdit);
-    axios.post(`/api/update_product`, product)
-    .then( response => {
-      var data = response.data;
-      switch (data.status) {
-        case 422:
-          setFormErrors(data.errors);
-          setTimeout(() => {
-            setFormErrors({});
-          }, 4000);
-          break;
-        case 201:
-          setProductToEdit(null);
-          setInfoMessage('One product has been updated successfully!');
-          break;
-        default:
-          console.log(data);
-          break;
-      }
-    })
-    .catch( error => {
-
-    });
+    dispatch(updateProduct(product));
   }
+  useEffect(()=>{
+    if (updateState.success) {
+      setProductToEdit(null);
+      setInfoMessage('One product has been updated successfully!');
+      setDataToEdit({name:"", description:"", price:"" });
+      setImageToEdit('');
+    }
+    else if (!updateState.loading && updateState.validationError) {
+      setFormErrors(updateState.error);
+      setTimeout(() => {
+        setFormErrors({});
+      }, 5000);
+    }
+  }, [updateState.loading, updateState.success]);
 
   const warning = (id) => {
     setProductToDelete(id);
@@ -233,8 +225,8 @@ const AddProduct = () => {
               <tbody>{ loading ?
                   <tr>
                     <td colSpan="7" className="text-center">
-                      <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Loading...</span>
+                      <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
                       </div>
                     </td>
                   </tr> :

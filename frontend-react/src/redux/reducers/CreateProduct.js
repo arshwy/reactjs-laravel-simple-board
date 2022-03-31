@@ -33,6 +33,13 @@ export const createProductReducer = (state = initialState, action) => {
       success: false,
       error: action.payload
     }
+    case CreateProduct.RESET_CREATE_PRODUCT: return {
+      loading: false,
+      success: false,
+      validationError: false,
+      message: '',
+      error: '',
+    }
 
     default: return state; break;
   }
