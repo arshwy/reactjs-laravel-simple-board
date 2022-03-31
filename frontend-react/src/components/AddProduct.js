@@ -145,7 +145,7 @@ const AddProduct = () => {
     product.append('image', imageToEdit);
     dispatch(updateProduct(product));
   }
-  useEffect(()=>{
+  useEffect(() => {
     if (updateState.success) {
       setProductToEdit(null);
       setInfoMessage('One product has been updated successfully!');
@@ -172,10 +172,21 @@ const AddProduct = () => {
   const deleteApi = async () => {
     var p = allProducts.find(p => productToDelete === p.id);
     var data = {product_id: p.id};
-    axios.post(`api/delete_product`, data);
+    dispatch(deleteProduct(data));
     setProductToDelete(null);
-    setInfoMessage('One product has been deleted successfully!');
+
   }
+  useEffect(() => {
+    if (deleteState.success) {
+      setInfoMessage('One product has been deleted successfully!');
+    }
+    else{
+      setFormErrors(deleteState.error);
+      setTimeout(() => {
+        setFormErrors({});
+      }, 5000);
+    }
+  }, [deleteState.loading, deleteState.success]);
 
   return (
     <>

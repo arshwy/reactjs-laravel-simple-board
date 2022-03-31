@@ -6,7 +6,6 @@ import { // each has (requet, success, failure)
 
   const initialState = {
     loading: false,
-    products: [],
     success: false,
     message: '',
     error: ''
@@ -29,6 +28,12 @@ export  const deleteProductReducer = (state = initialState, action) => {
         loading: false,
         success: false,
         error: action.payload
+      }
+      case DeleteProduct.RESET_DELETE_PRODUCT: return {
+        loading: false,
+        success: false,
+        message: '',
+        error: ''
       }
 
       default: return state; break;

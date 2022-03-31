@@ -39,7 +39,6 @@ const ResetInitials = () => {
 
 export const updateProduct = (product) => {
   // thanks to the thunk package we can return a function inside this function
-  console.log("Pr:: ", product);
   const p = new FormData();
   return (dispatch) =>  {
     dispatch(UpdateProductRequest())

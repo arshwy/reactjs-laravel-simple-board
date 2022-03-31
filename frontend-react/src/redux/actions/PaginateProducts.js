@@ -4,8 +4,6 @@ import axios from 'axios'
 
 // for paginating the products
 const PaginateProductsRequest = ({productsPerPage, currentPage}) => {
-  console.log("current page: ", currentPage)
-  console.log("products per page: ", productsPerPage)
   return {
     type: PaginateProducts.PAGINATE_PRODUCTS_REQUEST,
     payload: productsPerPage,
@@ -37,8 +35,6 @@ const PaginateProductsFailure = error => {
 
 export const paginateProducts = ({productsPerPage, currentPage}) => {
   // thanks to the thunk package we can return a function inside this function
-  console.log("current page: ", currentPage)
-  console.log("products per page: ", productsPerPage)
   return (dispatch) =>  {
     dispatch(PaginateProductsRequest({productsPerPage, currentPage}))
     axios.get(`/api/paginate_all_products/${productsPerPage}?page=${currentPage}`)

@@ -10,10 +10,10 @@ const DeleteProductRequest = pid => {
     payload: pid
   }
 }
-const DeleteProductSuccess = message => {
+const DeleteProductSuccess = () => {
   return {
     type: DeleteProduct.DELETE_PRODUCT_SUCCESS,
-    payload: message
+    payload: ''
   }
 }
 const DeleteProductFailure = error => {
@@ -22,13 +22,25 @@ const DeleteProductFailure = error => {
     payload: error
   }
 }
+
+const ResetInitials = () => {
+  return {
+    type: DeleteProduct.RESET_DELETE_PRODUCT
+  }
+}
+
+
+
 export const deleteProduct = (data) => {
   // thanks to the thunk package we can return a function inside this function
   return (dispatch) =>  {
     dispatch(DeleteProductRequest(data.product_id))
     axios.post(`/api/delete_product/`, data)
       .then(response => {
-        dispatch(DeleteProductSuccess("One product has been deleted successfully!"))
+        dispatch(DeleteProductSuccess())
+        setTimeout(() => {
+          dispatch(ResetInitials());
+        }, 2000);
       })
       .catch(error => {
         dispatch(DeleteProductFailure(error.message))

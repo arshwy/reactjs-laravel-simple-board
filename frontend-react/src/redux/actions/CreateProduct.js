@@ -39,7 +39,6 @@ const ResetInitials = () => {
 
 export const createProduct = (product) => {
   // thanks to the thunk package we can return a function inside this function
-  console.log("Pr:: ", product);
   const p = new FormData();
   p.append('name', product.name);
   p.append('description', product.description);
